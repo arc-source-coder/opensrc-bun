@@ -1,0 +1,36 @@
+{
+  "name": "opensrc",
+  "version": "0.1.0",
+  "description": "Fetch source code for npm packages to give coding agents deeper context",
+  "type": "module",
+  "bin": {
+    "opensrc": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "cli",
+    "source-code",
+    "npm",
+    "packages",
+    "ai",
+    "coding-agents"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.1.0",
+    "simple-git": "^3.27.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+
