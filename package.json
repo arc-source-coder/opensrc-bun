@@ -1,6 +1,6 @@
 {
   "name": "opensrc",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Fetch source code for npm packages to give coding agents deeper context",
   "type": "module",
   "bin": {
