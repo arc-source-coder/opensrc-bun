@@ -97,9 +97,10 @@ async function getVersionFromPnpmLock(
     const content = await readFile(lockPath, 'utf-8');
     
     // Look for the package in the lockfile
-    // Format varies but typically: '/packageName@version:' or 'packageName@version:'
+    // pnpm format: 'packageName@version(peer-deps):' or 'packageName@version:'
+    // We need to stop at '(' (peer deps), ':' (end of key), or quotes
     const escapedName = packageName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`['"]?${escapedName}@([^:'"\n]+)`, 'g');
+    const regex = new RegExp(`['"]?${escapedName}@([^(':"\\s]+)`, 'g');
     const matches = [...content.matchAll(regex)];
     
     if (matches.length > 0) {
