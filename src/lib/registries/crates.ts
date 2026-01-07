@@ -55,7 +55,7 @@ async function fetchCrateInfo(crateName: string): Promise<CrateResponse> {
   const response = await fetch(url, {
     headers: {
       Accept: "application/json",
-      "User-Agent": "opensrc-cli (https://github.com/opensrc-labs/opensrc)",
+      "User-Agent": "opensrc-cli (https://github.com/vercel-labs/opensrc)",
     },
   });
 
@@ -83,7 +83,7 @@ async function fetchCrateVersionInfo(
   const response = await fetch(url, {
     headers: {
       Accept: "application/json",
-      "User-Agent": "opensrc-cli (https://github.com/opensrc-labs/opensrc)",
+      "User-Agent": "opensrc-cli (https://github.com/vercel-labs/opensrc)",
     },
   });
 
