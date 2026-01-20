@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "bun:test";
 import { mkdir, rm, readFile, writeFile } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
@@ -96,10 +96,7 @@ describe("ensureAgentsMd", () => {
 
   it("preserves content before and after section when updating", async () => {
     const oldSection = `${SECTION_MARKER}\n\nOld content\n\n${SECTION_END_MARKER}`;
-    await writeFile(
-      AGENTS_FILE,
-      `# Header\n\nBefore content\n\n${oldSection}\n\nAfter content`,
-    );
+    await writeFile(AGENTS_FILE, `# Header\n\nBefore content\n\n${oldSection}\n\nAfter content`);
 
     await ensureAgentsMd(TEST_DIR);
 

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "bun:test";
 import { mkdir, rm, readFile, writeFile } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
@@ -147,10 +147,7 @@ describe("removeFromGitignore", () => {
   });
 
   it("cleans up multiple consecutive blank lines", async () => {
-    await writeFile(
-      GITIGNORE_PATH,
-      "node_modules/\n\n\n\nopensrc/\n\n\n\ndist/\n",
-    );
+    await writeFile(GITIGNORE_PATH, "node_modules/\n\n\n\nopensrc/\n\n\n\ndist/\n");
 
     await removeFromGitignore(TEST_DIR);
 

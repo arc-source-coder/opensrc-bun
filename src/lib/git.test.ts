@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "bun:test";
 import { mkdir, rm, writeFile } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
@@ -64,9 +64,7 @@ describe("path helpers", () => {
 
   describe("getRepoRelativePath", () => {
     it("returns relative path for repo", () => {
-      expect(getRepoRelativePath("github.com/vercel/ai")).toBe(
-        "repos/github.com/vercel/ai",
-      );
+      expect(getRepoRelativePath("github.com/vercel/ai")).toBe("repos/github.com/vercel/ai");
     });
   });
 });
@@ -111,9 +109,7 @@ describe("parseRepoUrl", () => {
 
 describe("getRepoDisplayName", () => {
   it("extracts display name from HTTPS URL", () => {
-    expect(getRepoDisplayName("https://github.com/vercel/ai")).toBe(
-      "github.com/vercel/ai",
-    );
+    expect(getRepoDisplayName("https://github.com/vercel/ai")).toBe("github.com/vercel/ai");
   });
 
   it("extracts display name from SSH URL", () => {
@@ -143,18 +139,14 @@ describe("existence checks", () => {
 
   describe("packageRepoExists", () => {
     it("returns false if repo does not exist", () => {
-      expect(packageRepoExists("https://github.com/vercel/ai", TEST_DIR)).toBe(
-        false,
-      );
+      expect(packageRepoExists("https://github.com/vercel/ai", TEST_DIR)).toBe(false);
     });
 
     it("returns true if repo exists", async () => {
       const repoDir = join(OPENSRC_DIR, "repos", "github.com", "vercel", "ai");
       await mkdir(repoDir, { recursive: true });
 
-      expect(packageRepoExists("https://github.com/vercel/ai", TEST_DIR)).toBe(
-        true,
-      );
+      expect(packageRepoExists("https://github.com/vercel/ai", TEST_DIR)).toBe(true);
     });
 
     it("returns false for invalid URL", () => {
@@ -170,10 +162,7 @@ describe("sources.json reading", () => {
     });
 
     it("returns null if package not in sources.json", async () => {
-      await writeFile(
-        join(OPENSRC_DIR, "sources.json"),
-        JSON.stringify({ packages: [] }),
-      );
+      await writeFile(join(OPENSRC_DIR, "sources.json"), JSON.stringify({ packages: [] }));
 
       expect(await getPackageInfo("zod", TEST_DIR, "npm")).toBeNull();
     });
@@ -230,10 +219,7 @@ describe("sources.json reading", () => {
     });
 
     it("returns null if repo not in sources.json", async () => {
-      await writeFile(
-        join(OPENSRC_DIR, "sources.json"),
-        JSON.stringify({ repos: [] }),
-      );
+      await writeFile(join(OPENSRC_DIR, "sources.json"), JSON.stringify({ repos: [] }));
 
       expect(await getRepoInfo("github.com/vercel/ai", TEST_DIR)).toBeNull();
     });
@@ -322,13 +308,7 @@ describe("removal functions", () => {
     });
 
     it("removes repo when package is the only user", async () => {
-      const repoDir = join(
-        OPENSRC_DIR,
-        "repos",
-        "github.com",
-        "colinhacks",
-        "zod",
-      );
+      const repoDir = join(OPENSRC_DIR, "repos", "github.com", "colinhacks", "zod");
       await mkdir(repoDir, { recursive: true });
       await writeFile(join(repoDir, "package.json"), "{}");
       await writeFile(
@@ -353,13 +333,7 @@ describe("removal functions", () => {
     });
 
     it("does not remove repo when other packages share it", async () => {
-      const repoDir = join(
-        OPENSRC_DIR,
-        "repos",
-        "github.com",
-        "owner",
-        "monorepo",
-      );
+      const repoDir = join(OPENSRC_DIR, "repos", "github.com", "owner", "monorepo");
       await mkdir(repoDir, { recursive: true });
       await writeFile(join(repoDir, "package.json"), "{}");
       await writeFile(
@@ -413,30 +387,20 @@ describe("removal functions", () => {
 
       await removeRepoSource("github.com/vercel/ai", TEST_DIR);
 
-      expect(
-        existsSync(join(OPENSRC_DIR, "repos", "github.com", "vercel")),
-      ).toBe(false);
+      expect(existsSync(join(OPENSRC_DIR, "repos", "github.com", "vercel"))).toBe(false);
       expect(existsSync(join(OPENSRC_DIR, "repos", "github.com"))).toBe(false);
     });
 
     it("does not remove owner dir if other repos exist", async () => {
       const repo1Dir = join(OPENSRC_DIR, "repos", "github.com", "vercel", "ai");
-      const repo2Dir = join(
-        OPENSRC_DIR,
-        "repos",
-        "github.com",
-        "vercel",
-        "next.js",
-      );
+      const repo2Dir = join(OPENSRC_DIR, "repos", "github.com", "vercel", "next.js");
       await mkdir(repo1Dir, { recursive: true });
       await mkdir(repo2Dir, { recursive: true });
 
       await removeRepoSource("github.com/vercel/ai", TEST_DIR);
 
       expect(existsSync(repo1Dir)).toBe(false);
-      expect(
-        existsSync(join(OPENSRC_DIR, "repos", "github.com", "vercel")),
-      ).toBe(true);
+      expect(existsSync(join(OPENSRC_DIR, "repos", "github.com", "vercel"))).toBe(true);
     });
   });
 });
