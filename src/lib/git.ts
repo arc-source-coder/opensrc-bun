@@ -25,9 +25,7 @@ export function getReposDir(cwd: string = process.cwd()): string {
 /**
  * Extract host/owner/repo from a git URL
  */
-export function parseRepoUrl(
-  url: string,
-): { host: string; owner: string; repo: string } | null {
+export function parseRepoUrl(url: string): { host: string; owner: string; repo: string } | null {
   // Handle HTTPS URLs: https://github.com/owner/repo
   const httpsMatch = url.match(/https?:\/\/([^/]+)\/([^/]+)\/([^/]+)/);
   if (httpsMatch) {
@@ -54,10 +52,7 @@ export function parseRepoUrl(
 /**
  * Get the path where a repo's source will be stored
  */
-export function getRepoPath(
-  displayName: string,
-  cwd: string = process.cwd(),
-): string {
+export function getRepoPath(displayName: string, cwd: string = process.cwd()): string {
   return join(getReposDir(cwd), displayName);
 }
 
@@ -116,20 +111,14 @@ async function readSourcesJson(cwd: string): Promise<{
 /**
  * Check if a repo source already exists
  */
-export function repoExists(
-  displayName: string,
-  cwd: string = process.cwd(),
-): boolean {
+export function repoExists(displayName: string, cwd: string = process.cwd()): boolean {
   return existsSync(getRepoPath(displayName, cwd));
 }
 
 /**
  * Check if a package's repo already exists
  */
-export function packageRepoExists(
-  repoUrl: string,
-  cwd: string = process.cwd(),
-): boolean {
+export function packageRepoExists(repoUrl: string, cwd: string = process.cwd()): boolean {
   const displayName = getRepoDisplayName(repoUrl);
   if (!displayName) return false;
   return repoExists(displayName, cwd);
@@ -148,11 +137,7 @@ export async function getPackageInfo(
     return null;
   }
 
-  return (
-    sources.packages.find(
-      (p) => p.name === packageName && p.registry === registry,
-    ) || null
-  );
+  return sources.packages.find((p) => p.name === packageName && p.registry === registry) || null;
 }
 
 /**
@@ -183,13 +168,7 @@ async function cloneAtTag(
 
   for (const tag of tagsToTry) {
     try {
-      await git.clone(repoUrl, targetPath, [
-        "--depth",
-        "1",
-        "--branch",
-        tag,
-        "--single-branch",
-      ]);
+      await git.clone(repoUrl, targetPath, ["--depth", "1", "--branch", tag, "--single-branch"]);
       return { success: true, tag };
     } catch {
       continue;
@@ -222,13 +201,7 @@ async function cloneAtRef(
   ref: string,
 ): Promise<{ success: boolean; ref?: string; error?: string }> {
   try {
-    await git.clone(repoUrl, targetPath, [
-      "--depth",
-      "1",
-      "--branch",
-      ref,
-      "--single-branch",
-    ]);
+    await git.clone(repoUrl, targetPath, ["--depth", "1", "--branch", ref, "--single-branch"]);
     return { success: true, ref };
   } catch {
     // Ref might be a commit or doesn't exist as a branch/tag
@@ -292,12 +265,7 @@ export async function fetchSource(
   }
 
   // Clone the repository
-  const cloneResult = await cloneAtTag(
-    git,
-    resolved.repoUrl,
-    repoPath,
-    resolved.version,
-  );
+  const cloneResult = await cloneAtTag(git, resolved.repoUrl, repoPath, resolved.version);
 
   if (!cloneResult.success) {
     return {
@@ -360,12 +328,7 @@ export async function fetchRepoSource(
   }
 
   // Clone the repository
-  const cloneResult = await cloneAtRef(
-    git,
-    resolved.repoUrl,
-    repoPath,
-    resolved.ref,
-  );
+  const cloneResult = await cloneAtRef(git, resolved.repoUrl, repoPath, resolved.ref);
 
   if (!cloneResult.success) {
     return {
@@ -418,9 +381,7 @@ export async function removePackageSource(
     return { removed: false, repoRemoved: false };
   }
 
-  const pkg = sources.packages.find(
-    (p) => p.name === packageName && p.registry === registry,
-  );
+  const pkg = sources.packages.find((p) => p.name === packageName && p.registry === registry);
   if (!pkg) {
     return { removed: false, repoRemoved: false };
   }
@@ -475,10 +436,7 @@ export async function removeRepoSource(
 /**
  * Clean up empty parent directories after removing a repo
  */
-async function cleanupEmptyParentDirs(
-  relativePath: string,
-  cwd: string,
-): Promise<void> {
+async function cleanupEmptyParentDirs(relativePath: string, cwd: string): Promise<void> {
   const parts = relativePath.split("/");
   if (parts.length < 4) return; // repos/host/owner/repo - need at least 4 parts
 

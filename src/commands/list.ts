@@ -23,9 +23,7 @@ export async function listCommand(options: ListOptions = {}): Promise<void> {
 
   if (totalCount === 0) {
     console.log("No sources fetched yet.");
-    console.log(
-      "\nUse `opensrc <package>` to fetch source code for a package.",
-    );
+    console.log("\nUse `opensrc <package>` to fetch source code for a package.");
     console.log("Use `opensrc <owner>/<repo>` to fetch a GitHub repository.");
     console.log("\nSupported registries:");
     console.log("  • npm:      opensrc zod, opensrc npm:react");
@@ -112,9 +110,7 @@ export async function listCommand(options: ListOptions = {}): Promise<void> {
     .join(", ");
 
   const summary = [
-    registryCounts
-      ? `${sources.packages.length} package(s) (${registryCounts})`
-      : null,
+    registryCounts ? `${sources.packages.length} package(s) (${registryCounts})` : null,
     sources.repos.length > 0 ? `${sources.repos.length} repo(s)` : null,
   ]
     .filter(Boolean)

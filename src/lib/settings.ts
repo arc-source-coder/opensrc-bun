@@ -29,9 +29,7 @@ async function ensureOpensrcDir(cwd: string): Promise<void> {
 /**
  * Read settings from opensrc/settings.json
  */
-export async function readSettings(
-  cwd: string = process.cwd(),
-): Promise<OpensrcSettings> {
+export async function readSettings(cwd: string = process.cwd()): Promise<OpensrcSettings> {
   const settingsPath = getSettingsPath(cwd);
 
   if (!existsSync(settingsPath)) {
@@ -55,11 +53,7 @@ export async function writeSettings(
 ): Promise<void> {
   await ensureOpensrcDir(cwd);
   const settingsPath = getSettingsPath(cwd);
-  await writeFile(
-    settingsPath,
-    JSON.stringify(settings, null, 2) + "\n",
-    "utf-8",
-  );
+  await writeFile(settingsPath, JSON.stringify(settings, null, 2) + "\n", "utf-8");
 }
 
 /**

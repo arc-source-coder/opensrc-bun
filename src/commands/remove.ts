@@ -17,10 +17,7 @@ export interface RemoveOptions {
 /**
  * Remove source code for one or more packages or repositories
  */
-export async function removeCommand(
-  items: string[],
-  options: RemoveOptions = {},
-): Promise<void> {
+export async function removeCommand(items: string[], options: RemoveOptions = {}): Promise<void> {
   const cwd = options.cwd || process.cwd();
   let removed = 0;
   let notFound = 0;
@@ -31,8 +28,7 @@ export async function removeCommand(
 
   for (const item of items) {
     // Check if it's a repo or package based on format
-    const isRepo =
-      isRepoSpec(item) || (item.includes("/") && !item.includes(":"));
+    const isRepo = isRepoSpec(item) || (item.includes("/") && !item.includes(":"));
 
     if (isRepo) {
       // Try to remove as repo
@@ -105,9 +101,7 @@ export async function removeCommand(
     }
   }
 
-  console.log(
-    `\nRemoved ${removed} source(s)${notFound > 0 ? `, ${notFound} not found` : ""}`,
-  );
+  console.log(`\nRemoved ${removed} source(s)${notFound > 0 ? `, ${notFound} not found` : ""}`);
 
   // Update sources.json with remaining sources
   if (removed > 0) {
@@ -115,16 +109,11 @@ export async function removeCommand(
 
     // Filter out removed packages
     const remainingPackages: PackageEntry[] = sources.packages.filter(
-      (p) =>
-        !removedPackages.some(
-          (rp) => rp.name === p.name && rp.registry === p.registry,
-        ),
+      (p) => !removedPackages.some((rp) => rp.name === p.name && rp.registry === p.registry),
     );
 
     // Filter out removed repos
-    const remainingRepos: RepoEntry[] = sources.repos.filter(
-      (r) => !removedRepos.includes(r.name),
-    );
+    const remainingRepos: RepoEntry[] = sources.repos.filter((r) => !removedRepos.includes(r.name));
 
     const agentsUpdated = await updateAgentsMd(
       { packages: remainingPackages, repos: remainingRepos },

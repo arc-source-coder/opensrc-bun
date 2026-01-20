@@ -11,9 +11,7 @@ const program = new Command();
 
 program
   .name("opensrc")
-  .description(
-    "Fetch source code for packages to give coding agents deeper context",
-  )
+  .description("Fetch source code for packages to give coding agents deeper context")
   .version("0.1.0");
 
 // Default command: fetch packages
@@ -32,19 +30,17 @@ program
       return true;
     },
   )
-  .action(
-    async (packages: string[], options: { cwd?: string; modify?: boolean }) => {
-      if (packages.length === 0) {
-        program.help();
-        return;
-      }
+  .action(async (packages: string[], options: { cwd?: string; modify?: boolean }) => {
+    if (packages.length === 0) {
+      program.help();
+      return;
+    }
 
-      await fetchCommand(packages, {
-        cwd: options.cwd,
-        allowModifications: options.modify,
-      });
-    },
-  );
+    await fetchCommand(packages, {
+      cwd: options.cwd,
+      allowModifications: options.modify,
+    });
+  });
 
 // List command
 program

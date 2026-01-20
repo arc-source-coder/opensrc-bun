@@ -8,9 +8,7 @@ const MARKER_COMMENT = "# opensrc - source code for packages";
 /**
  * Check if .gitignore already has .opensrc/ entry
  */
-export async function hasOpensrcEntry(
-  cwd: string = process.cwd(),
-): Promise<boolean> {
+export async function hasOpensrcEntry(cwd: string = process.cwd()): Promise<boolean> {
   const gitignorePath = join(cwd, ".gitignore");
 
   if (!existsSync(gitignorePath)) {
@@ -33,9 +31,7 @@ export async function hasOpensrcEntry(
 /**
  * Add .opensrc/ to .gitignore if not already present
  */
-export async function ensureGitignore(
-  cwd: string = process.cwd(),
-): Promise<boolean> {
+export async function ensureGitignore(cwd: string = process.cwd()): Promise<boolean> {
   const gitignorePath = join(cwd, ".gitignore");
 
   // Check if already has entry
@@ -66,9 +62,7 @@ export async function ensureGitignore(
 /**
  * Remove .opensrc/ from .gitignore
  */
-export async function removeFromGitignore(
-  cwd: string = process.cwd(),
-): Promise<boolean> {
+export async function removeFromGitignore(cwd: string = process.cwd()): Promise<boolean> {
   const gitignorePath = join(cwd, ".gitignore");
 
   if (!existsSync(gitignorePath)) {
@@ -81,11 +75,7 @@ export async function removeFromGitignore(
 
     const newLines = lines.filter((line) => {
       const trimmed = line.trim();
-      return (
-        trimmed !== OPENSRC_ENTRY &&
-        trimmed !== "opensrc" &&
-        trimmed !== MARKER_COMMENT
-      );
+      return trimmed !== OPENSRC_ENTRY && trimmed !== "opensrc" && trimmed !== MARKER_COMMENT;
     });
 
     // Clean up multiple consecutive blank lines

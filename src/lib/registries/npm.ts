@@ -32,9 +32,7 @@ export function parseNpmSpec(spec: string): {
 /**
  * Fetch package metadata from npm registry
  */
-export async function fetchNpmPackageInfo(
-  packageName: string,
-): Promise<RegistryResponse> {
+export async function fetchNpmPackageInfo(packageName: string): Promise<RegistryResponse> {
   const url = `${NPM_REGISTRY}/${encodeURIComponent(packageName).replace("%40", "@")}`;
 
   const response = await fetch(url, {
@@ -47,9 +45,7 @@ export async function fetchNpmPackageInfo(
     if (response.status === 404) {
       throw new Error(`Package "${packageName}" not found on npm`);
     }
-    throw new Error(
-      `Failed to fetch package info: ${response.status} ${response.statusText}`,
-    );
+    throw new Error(`Failed to fetch package info: ${response.status} ${response.statusText}`);
   }
 
   return response.json() as Promise<RegistryResponse>;

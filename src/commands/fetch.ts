@@ -52,9 +52,7 @@ async function checkFileModificationPermission(
     return storedPermission;
   }
 
-  console.log(
-    "\nopensrc can update the following files for better integration:",
-  );
+  console.log("\nopensrc can update the following files for better integration:");
   console.log("  • .gitignore - add opensrc/ to ignore list");
   console.log("  • tsconfig.json - exclude opensrc/ from compilation");
   console.log("  • AGENTS.md - add source code reference section\n");
@@ -103,9 +101,7 @@ async function fetchRepoInput(spec: string, cwd: string): Promise<FetchResult> {
   }
 
   const displayName = `${repoSpec.host}/${repoSpec.owner}/${repoSpec.repo}`;
-  console.log(
-    `\nFetching ${repoSpec.owner}/${repoSpec.repo} from ${repoSpec.host}...`,
-  );
+  console.log(`\nFetching ${repoSpec.owner}/${repoSpec.repo} from ${repoSpec.host}...`);
 
   try {
     // Check if already exists with the same ref
@@ -120,9 +116,7 @@ async function fetchRepoInput(spec: string, cwd: string): Promise<FetchResult> {
           success: true,
         };
       } else if (existing) {
-        console.log(
-          `  → Updating ${existing.version} → ${repoSpec.ref || "default branch"}`,
-        );
+        console.log(`  → Updating ${existing.version} → ${repoSpec.ref || "default branch"}`);
       }
     }
 
@@ -162,10 +156,7 @@ async function fetchRepoInput(spec: string, cwd: string): Promise<FetchResult> {
 /**
  * Fetch a package from any registry
  */
-async function fetchPackageInput(
-  spec: string,
-  cwd: string,
-): Promise<FetchResult> {
+async function fetchPackageInput(spec: string, cwd: string): Promise<FetchResult> {
   const packageSpec = parsePackageSpec(spec);
   const { registry, name } = packageSpec;
   let { version } = packageSpec;
@@ -201,9 +192,7 @@ async function fetchPackageInput(
         registry,
       };
     } else if (existingPkg) {
-      console.log(
-        `  → Updating ${existingPkg.version} → ${version || "latest"}`,
-      );
+      console.log(`  → Updating ${existingPkg.version} → ${version || "latest"}`);
     }
 
     // Resolve package info from registry
@@ -322,10 +311,7 @@ export async function fetchCommand(
   const results: FetchResult[] = [];
 
   // Check if we're allowed to modify files
-  const canModifyFiles = await checkFileModificationPermission(
-    cwd,
-    options.allowModifications,
-  );
+  const canModifyFiles = await checkFileModificationPermission(cwd, options.allowModifications);
 
   if (canModifyFiles) {
     const gitignoreUpdated = await ensureGitignore(cwd);

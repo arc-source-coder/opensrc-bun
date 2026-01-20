@@ -110,9 +110,7 @@ export async function updatePackageIndex(
 /**
  * Check if AGENTS.md has an opensrc section
  */
-export async function hasOpensrcSection(
-  cwd: string = process.cwd(),
-): Promise<boolean> {
+export async function hasOpensrcSection(cwd: string = process.cwd()): Promise<boolean> {
   const agentsPath = join(cwd, AGENTS_FILE);
 
   if (!existsSync(agentsPath)) {
@@ -144,9 +142,7 @@ function extractSection(content: string): string | null {
 /**
  * Ensure AGENTS.md has the opensrc section (add or update)
  */
-export async function ensureAgentsMd(
-  cwd: string = process.cwd(),
-): Promise<boolean> {
+export async function ensureAgentsMd(cwd: string = process.cwd()): Promise<boolean> {
   const agentsPath = join(cwd, AGENTS_FILE);
   const newSection = getSectionContent();
 
@@ -219,9 +215,7 @@ export async function updateAgentsMd(
 /**
  * Remove the opensrc section from AGENTS.md
  */
-export async function removeOpensrcSection(
-  cwd: string = process.cwd(),
-): Promise<boolean> {
+export async function removeOpensrcSection(cwd: string = process.cwd()): Promise<boolean> {
   const agentsPath = join(cwd, AGENTS_FILE);
 
   if (!existsSync(agentsPath)) {

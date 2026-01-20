@@ -19,9 +19,7 @@ export function hasTsConfig(cwd: string = process.cwd()): boolean {
 /**
  * Check if tsconfig.json already excludes opensrc/
  */
-export async function hasOpensrcExclude(
-  cwd: string = process.cwd(),
-): Promise<boolean> {
+export async function hasOpensrcExclude(cwd: string = process.cwd()): Promise<boolean> {
   const tsconfigPath = join(cwd, "tsconfig.json");
 
   if (!existsSync(tsconfigPath)) {
@@ -38,9 +36,7 @@ export async function hasOpensrcExclude(
 
     return config.exclude.some(
       (entry) =>
-        entry === OPENSRC_DIR ||
-        entry === `${OPENSRC_DIR}/` ||
-        entry === `./${OPENSRC_DIR}`,
+        entry === OPENSRC_DIR || entry === `${OPENSRC_DIR}/` || entry === `./${OPENSRC_DIR}`,
     );
   } catch {
     return false;
@@ -50,9 +46,7 @@ export async function hasOpensrcExclude(
 /**
  * Add opensrc/ to tsconfig.json exclude array
  */
-export async function ensureTsconfigExclude(
-  cwd: string = process.cwd(),
-): Promise<boolean> {
+export async function ensureTsconfigExclude(cwd: string = process.cwd()): Promise<boolean> {
   const tsconfigPath = join(cwd, "tsconfig.json");
 
   if (!existsSync(tsconfigPath)) {
@@ -75,11 +69,7 @@ export async function ensureTsconfigExclude(
     config.exclude.push(OPENSRC_DIR);
 
     // Preserve formatting by using 2-space indent (most common for tsconfig)
-    await writeFile(
-      tsconfigPath,
-      JSON.stringify(config, null, 2) + "\n",
-      "utf-8",
-    );
+    await writeFile(tsconfigPath, JSON.stringify(config, null, 2) + "\n", "utf-8");
     return true;
   } catch {
     return false;

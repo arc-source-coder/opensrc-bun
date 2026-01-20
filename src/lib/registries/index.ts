@@ -75,9 +75,7 @@ export function parsePackageSpec(spec: string): PackageSpec {
 /**
  * Resolve a package to its repository information
  */
-export async function resolvePackage(
-  spec: PackageSpec,
-): Promise<ResolvedPackage> {
+export async function resolvePackage(spec: PackageSpec): Promise<ResolvedPackage> {
   const { registry, name, version } = spec;
 
   switch (registry) {

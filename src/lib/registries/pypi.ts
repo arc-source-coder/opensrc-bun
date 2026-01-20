@@ -46,10 +46,7 @@ export function parsePyPISpec(spec: string): {
 /**
  * Fetch package metadata from PyPI
  */
-async function fetchPyPIPackageInfo(
-  packageName: string,
-  version?: string,
-): Promise<PyPIResponse> {
+async function fetchPyPIPackageInfo(packageName: string, version?: string): Promise<PyPIResponse> {
   const url = version
     ? `${PYPI_API}/${packageName}/${version}/json`
     : `${PYPI_API}/${packageName}/json`;
@@ -64,9 +61,7 @@ async function fetchPyPIPackageInfo(
     if (response.status === 404) {
       throw new Error(`Package "${packageName}" not found on PyPI`);
     }
-    throw new Error(
-      `Failed to fetch package info: ${response.status} ${response.statusText}`,
-    );
+    throw new Error(`Failed to fetch package info: ${response.status} ${response.statusText}`);
   }
 
   return response.json() as Promise<PyPIResponse>;
@@ -78,14 +73,7 @@ async function fetchPyPIPackageInfo(
 function extractRepoUrl(info: PyPIResponse["info"]): string | null {
   // Check project_urls for common repository keys
   const projectUrls = info.project_urls || {};
-  const repoKeys = [
-    "Source",
-    "Source Code",
-    "Repository",
-    "GitHub",
-    "Code",
-    "Homepage",
-  ];
+  const repoKeys = ["Source", "Source Code", "Repository", "GitHub", "Code", "Homepage"];
 
   for (const key of repoKeys) {
     const url = projectUrls[key];
@@ -110,11 +98,7 @@ function extractRepoUrl(info: PyPIResponse["info"]): string | null {
 }
 
 function isGitRepoUrl(url: string): boolean {
-  return (
-    url.includes("github.com") ||
-    url.includes("gitlab.com") ||
-    url.includes("bitbucket.org")
-  );
+  return url.includes("github.com") || url.includes("gitlab.com") || url.includes("bitbucket.org");
 }
 
 function normalizeRepoUrl(url: string): string {
@@ -164,9 +148,7 @@ export async function resolvePyPIPackage(
     throw new Error(
       `No repository URL found for "${packageName}@${resolvedVersion}". ` +
         `This package may not have its source published.` +
-        (availableVersions.length > 0
-          ? ` Recent versions: ${availableVersions.join(", ")}`
-          : ""),
+        (availableVersions.length > 0 ? ` Recent versions: ${availableVersions.join(", ")}` : ""),
     );
   }
 

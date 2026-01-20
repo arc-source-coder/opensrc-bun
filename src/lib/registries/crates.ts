@@ -63,9 +63,7 @@ async function fetchCrateInfo(crateName: string): Promise<CrateResponse> {
     if (response.status === 404) {
       throw new Error(`Crate "${crateName}" not found on crates.io`);
     }
-    throw new Error(
-      `Failed to fetch crate info: ${response.status} ${response.statusText}`,
-    );
+    throw new Error(`Failed to fetch crate info: ${response.status} ${response.statusText}`);
   }
 
   return response.json() as Promise<CrateResponse>;
@@ -89,9 +87,7 @@ async function fetchCrateVersionInfo(
 
   if (!response.ok) {
     if (response.status === 404) {
-      throw new Error(
-        `Version "${version}" not found for crate "${crateName}"`,
-      );
+      throw new Error(`Version "${version}" not found for crate "${crateName}"`);
     }
     throw new Error(
       `Failed to fetch crate version info: ${response.status} ${response.statusText}`,
@@ -119,11 +115,7 @@ function extractRepoUrl(crate: CrateResponse["crate"]): string | null {
 }
 
 function isGitRepoUrl(url: string): boolean {
-  return (
-    url.includes("github.com") ||
-    url.includes("gitlab.com") ||
-    url.includes("bitbucket.org")
-  );
+  return url.includes("github.com") || url.includes("gitlab.com") || url.includes("bitbucket.org");
 }
 
 function normalizeRepoUrl(url: string): string {
@@ -141,20 +133,14 @@ function normalizeRepoUrl(url: string): string {
 function getAvailableVersions(versions: CrateVersion[]): string[] {
   return versions
     .filter((v) => !v.yanked)
-    .sort(
-      (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-    )
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .map((v) => v.num);
 }
 
 /**
  * Resolve a crate to its repository information
  */
-export async function resolveCrate(
-  crateName: string,
-  version?: string,
-): Promise<ResolvedPackage> {
+export async function resolveCrate(crateName: string, version?: string): Promise<ResolvedPackage> {
   const info = await fetchCrateInfo(crateName);
 
   // If version specified, verify it exists
@@ -168,9 +154,7 @@ export async function resolveCrate(
   const repoUrl = extractRepoUrl(info.crate);
 
   if (!repoUrl) {
-    const availableVersions = getAvailableVersions(info.versions)
-      .slice(0, 5)
-      .join(", ");
+    const availableVersions = getAvailableVersions(info.versions).slice(0, 5).join(", ");
     throw new Error(
       `No repository URL found for "${crateName}@${resolvedVersion}". ` +
         `This crate may not have its source published. ` +

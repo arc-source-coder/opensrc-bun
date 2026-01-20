@@ -24,16 +24,8 @@ function stripVersionPrefix(version: string): string {
 /**
  * Try to get installed version from node_modules
  */
-async function getVersionFromNodeModules(
-  packageName: string,
-  cwd: string,
-): Promise<string | null> {
-  const packageJsonPath = join(
-    cwd,
-    "node_modules",
-    packageName,
-    "package.json",
-  );
+async function getVersionFromNodeModules(packageName: string, cwd: string): Promise<string | null> {
+  const packageJsonPath = join(cwd, "node_modules", packageName, "package.json");
 
   if (!existsSync(packageJsonPath)) {
     return null;
@@ -51,10 +43,7 @@ async function getVersionFromNodeModules(
 /**
  * Try to get installed version from package-lock.json
  */
-async function getVersionFromPackageLock(
-  packageName: string,
-  cwd: string,
-): Promise<string | null> {
+async function getVersionFromPackageLock(packageName: string, cwd: string): Promise<string | null> {
   const lockPath = join(cwd, "package-lock.json");
 
   if (!existsSync(lockPath)) {
@@ -88,10 +77,7 @@ async function getVersionFromPackageLock(
  * Try to get installed version from pnpm-lock.yaml
  * This is a simplified parser - pnpm lockfiles are complex
  */
-async function getVersionFromPnpmLock(
-  packageName: string,
-  cwd: string,
-): Promise<string | null> {
+async function getVersionFromPnpmLock(packageName: string, cwd: string): Promise<string | null> {
   const lockPath = join(cwd, "pnpm-lock.yaml");
 
   if (!existsSync(lockPath)) {
@@ -123,10 +109,7 @@ async function getVersionFromPnpmLock(
 /**
  * Try to get version from yarn.lock
  */
-async function getVersionFromYarnLock(
-  packageName: string,
-  cwd: string,
-): Promise<string | null> {
+async function getVersionFromYarnLock(packageName: string, cwd: string): Promise<string | null> {
   const lockPath = join(cwd, "yarn.lock");
 
   if (!existsSync(lockPath)) {
@@ -159,10 +142,7 @@ async function getVersionFromYarnLock(
 /**
  * Get version from package.json dependencies (as fallback)
  */
-async function getVersionFromPackageJson(
-  packageName: string,
-  cwd: string,
-): Promise<string | null> {
+async function getVersionFromPackageJson(packageName: string, cwd: string): Promise<string | null> {
   const packageJsonPath = join(cwd, "package.json");
 
   if (!existsSync(packageJsonPath)) {
@@ -230,9 +210,7 @@ export async function detectInstalledVersion(
 /**
  * List all dependencies from package.json
  */
-export async function listDependencies(
-  cwd: string = process.cwd(),
-): Promise<InstalledPackage[]> {
+export async function listDependencies(cwd: string = process.cwd()): Promise<InstalledPackage[]> {
   const packageJsonPath = join(cwd, "package.json");
 
   if (!existsSync(packageJsonPath)) {

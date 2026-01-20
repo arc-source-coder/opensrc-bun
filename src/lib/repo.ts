@@ -54,10 +54,7 @@ export function parseRepoSpec(spec: string): RepoSpec | null {
       }
 
       // Handle /tree/branch or /blob/branch URLs
-      if (
-        pathParts.length >= 4 &&
-        (pathParts[2] === "tree" || pathParts[2] === "blob")
-      ) {
+      if (pathParts.length >= 4 && (pathParts[2] === "tree" || pathParts[2] === "blob")) {
         ref = pathParts[3];
       }
 
@@ -212,13 +209,9 @@ async function resolveGitHubRepo(
       );
     }
     if (response.status === 403) {
-      throw new Error(
-        `GitHub API rate limit exceeded. Try again later or authenticate.`,
-      );
+      throw new Error(`GitHub API rate limit exceeded. Try again later or authenticate.`);
     }
-    throw new Error(
-      `Failed to fetch repository info: ${response.status} ${response.statusText}`,
-    );
+    throw new Error(`Failed to fetch repository info: ${response.status} ${response.statusText}`);
   }
 
   const data = (await response.json()) as GitHubApiResponse;
@@ -256,9 +249,7 @@ async function resolveGitLabRepo(
           `Make sure it exists and is public.`,
       );
     }
-    throw new Error(
-      `Failed to fetch repository info: ${response.status} ${response.statusText}`,
-    );
+    throw new Error(`Failed to fetch repository info: ${response.status} ${response.statusText}`);
   }
 
   const data = (await response.json()) as GitLabApiResponse;
