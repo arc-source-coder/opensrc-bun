@@ -1,4 +1,4 @@
-import type { RegistryResponse, ResolvedPackage } from "../../types.js";
+import type { RegistryResponse, ResolvedPackage } from "../../types";
 
 const NPM_REGISTRY = "https://registry.npmjs.org";
 

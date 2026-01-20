@@ -1,10 +1,6 @@
-import {
-  detectInputType,
-  parsePackageSpec,
-  resolvePackage,
-} from "../lib/registries/index.js";
-import { parseRepoSpec, resolveRepo } from "../lib/repo.js";
-import { detectInstalledVersion } from "../lib/version.js";
+import { detectInputType, parsePackageSpec, resolvePackage } from "../lib/registries/index";
+import { parseRepoSpec, resolveRepo } from "../lib/repo";
+import { detectInstalledVersion } from "../lib/version";
 import {
   fetchSource,
   fetchRepoSource,
@@ -15,21 +11,18 @@ import {
   getRepoInfo,
   getRepoRelativePath,
   getRepoDisplayName,
-} from "../lib/git.js";
-import { ensureGitignore } from "../lib/gitignore.js";
-import { ensureTsconfigExclude } from "../lib/tsconfig.js";
+} from "../lib/git";
+import { ensureGitignore } from "../lib/gitignore";
+import { ensureTsconfigExclude } from "../lib/tsconfig";
 import {
   updateAgentsMd,
   updatePackageIndex,
   type PackageEntry,
   type RepoEntry,
-} from "../lib/agents.js";
-import {
-  getFileModificationPermission,
-  setFileModificationPermission,
-} from "../lib/settings.js";
-import { confirm } from "../lib/prompt.js";
-import type { FetchResult, Registry } from "../types.js";
+} from "../lib/agents";
+import { getFileModificationPermission, setFileModificationPermission } from "../lib/settings";
+import { confirm } from "../lib/prompt";
+import type { FetchResult, Registry } from "../types";
 
 export interface FetchOptions {
   cwd?: string;

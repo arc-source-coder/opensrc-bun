@@ -1,4 +1,4 @@
-import type { RepoSpec, ResolvedRepo } from "../types.js";
+import type { RepoSpec, ResolvedRepo } from "../types";
 
 // Supported git hosts
 const SUPPORTED_HOSTS = ["github.com", "gitlab.com", "bitbucket.org"];

@@ -4,15 +4,11 @@ import {
   repoExists,
   listSources,
   getPackageInfo,
-} from "../lib/git.js";
-import {
-  updateAgentsMd,
-  type PackageEntry,
-  type RepoEntry,
-} from "../lib/agents.js";
-import { isRepoSpec } from "../lib/repo.js";
-import { detectRegistry } from "../lib/registries/index.js";
-import type { Registry } from "../types.js";
+} from "../lib/git";
+import { updateAgentsMd, type PackageEntry, type RepoEntry } from "../lib/agents";
+import { isRepoSpec } from "../lib/repo";
+import { detectRegistry } from "../lib/registries/index";
+import type { Registry } from "../types";
 
 export interface RemoveOptions {
   cwd?: string;

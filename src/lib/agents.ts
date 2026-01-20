@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
-import type { Registry } from "../types.js";
+import type { Registry } from "../types";
 
 const AGENTS_FILE = "AGENTS.md";
 const OPENSRC_DIR = "opensrc";

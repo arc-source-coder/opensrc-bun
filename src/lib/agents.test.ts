@@ -8,7 +8,7 @@ import {
   updateAgentsMd,
   updatePackageIndex,
   removeOpensrcSection,
-} from "./agents.js";
+} from "./agents";
 
 const TEST_DIR = join(process.cwd(), ".test-agents");
 const AGENTS_FILE = join(TEST_DIR, "AGENTS.md");

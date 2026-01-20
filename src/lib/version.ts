@@ -1,7 +1,7 @@
 import { readFile } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
-import type { InstalledPackage } from "../types.js";
+import type { InstalledPackage } from "../types";
 
 interface PackageJson {
   dependencies?: Record<string, string>;

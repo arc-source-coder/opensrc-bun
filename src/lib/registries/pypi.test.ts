@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parsePyPISpec } from "./pypi.js";
+import { parsePyPISpec } from "./pypi";
 
 describe("parsePyPISpec", () => {
   describe("package name only", () => {

@@ -16,7 +16,7 @@ import {
   listSources,
   removePackageSource,
   removeRepoSource,
-} from "./git.js";
+} from "./git";
 
 const TEST_DIR = join(process.cwd(), ".test-git");
 const OPENSRC_DIR = join(TEST_DIR, "opensrc");

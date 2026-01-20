@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseCratesSpec } from "./crates.js";
+import { parseCratesSpec } from "./crates";
 
 describe("parseCratesSpec", () => {
   describe("crate name only", () => {

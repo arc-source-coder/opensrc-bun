@@ -2,12 +2,7 @@ import { simpleGit, SimpleGit } from "simple-git";
 import { rm, mkdir, readFile } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
-import type {
-  ResolvedPackage,
-  ResolvedRepo,
-  FetchResult,
-  Registry,
-} from "../types.js";
+import type { ResolvedPackage, ResolvedRepo, FetchResult, Registry } from "../types";
 
 const OPENSRC_DIR = "opensrc";
 const REPOS_DIR = "repos";

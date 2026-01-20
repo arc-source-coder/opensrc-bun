@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseNpmSpec } from "./npm.js";
+import { parseNpmSpec } from "./npm";
 
 describe("parseNpmSpec", () => {
   describe("regular packages", () => {

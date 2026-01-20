@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import { fetchCommand } from "./commands/fetch.js";
-import { listCommand } from "./commands/list.js";
-import { removeCommand } from "./commands/remove.js";
-import { cleanCommand } from "./commands/clean.js";
-import type { Registry } from "./types.js";
+import { fetchCommand } from "./commands/fetch";
+import { listCommand } from "./commands/list";
+import { removeCommand } from "./commands/remove";
+import { cleanCommand } from "./commands/clean";
+import type { Registry } from "./types";
 
 const program = new Command();
 

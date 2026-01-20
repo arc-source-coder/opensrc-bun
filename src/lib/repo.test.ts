@@ -1,10 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  parseRepoSpec,
-  isRepoSpec,
-  displayNameToSpec,
-  displayNameToOwnerRepo,
-} from "./repo.js";
+import { parseRepoSpec, isRepoSpec, displayNameToSpec, displayNameToOwnerRepo } from "./repo";
 
 describe("parseRepoSpec", () => {
   describe("github: prefix", () => {

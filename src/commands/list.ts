@@ -1,5 +1,5 @@
-import { listSources } from "../lib/git.js";
-import type { Registry } from "../types.js";
+import { listSources } from "../lib/git";
+import type { Registry } from "../types";
 
 export interface ListOptions {
   cwd?: string;

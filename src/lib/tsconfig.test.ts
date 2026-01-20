@@ -2,11 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdir, rm, readFile, writeFile } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
-import {
-  hasTsConfig,
-  hasOpensrcExclude,
-  ensureTsconfigExclude,
-} from "./tsconfig.js";
+import { hasTsConfig, hasOpensrcExclude, ensureTsconfigExclude } from "./tsconfig";
 
 const TEST_DIR = join(process.cwd(), ".test-tsconfig");
 const TSCONFIG_PATH = join(TEST_DIR, "tsconfig.json");
@@ -43,34 +39,22 @@ describe("hasOpensrcExclude", () => {
   });
 
   it("returns false if exclude array does not contain opensrc", async () => {
-    await writeFile(
-      TSCONFIG_PATH,
-      JSON.stringify({ exclude: ["node_modules", "dist"] }),
-    );
+    await writeFile(TSCONFIG_PATH, JSON.stringify({ exclude: ["node_modules", "dist"] }));
     expect(await hasOpensrcExclude(TEST_DIR)).toBe(false);
   });
 
   it("returns true if exclude contains opensrc", async () => {
-    await writeFile(
-      TSCONFIG_PATH,
-      JSON.stringify({ exclude: ["node_modules", "opensrc"] }),
-    );
+    await writeFile(TSCONFIG_PATH, JSON.stringify({ exclude: ["node_modules", "opensrc"] }));
     expect(await hasOpensrcExclude(TEST_DIR)).toBe(true);
   });
 
   it("returns true if exclude contains opensrc/", async () => {
-    await writeFile(
-      TSCONFIG_PATH,
-      JSON.stringify({ exclude: ["node_modules", "opensrc/"] }),
-    );
+    await writeFile(TSCONFIG_PATH, JSON.stringify({ exclude: ["node_modules", "opensrc/"] }));
     expect(await hasOpensrcExclude(TEST_DIR)).toBe(true);
   });
 
   it("returns true if exclude contains ./opensrc", async () => {
-    await writeFile(
-      TSCONFIG_PATH,
-      JSON.stringify({ exclude: ["node_modules", "./opensrc"] }),
-    );
+    await writeFile(TSCONFIG_PATH, JSON.stringify({ exclude: ["node_modules", "./opensrc"] }));
     expect(await hasOpensrcExclude(TEST_DIR)).toBe(true);
   });
 
@@ -94,10 +78,7 @@ describe("ensureTsconfigExclude", () => {
   });
 
   it("adds opensrc to existing exclude array", async () => {
-    await writeFile(
-      TSCONFIG_PATH,
-      JSON.stringify({ exclude: ["node_modules", "dist"] }),
-    );
+    await writeFile(TSCONFIG_PATH, JSON.stringify({ exclude: ["node_modules", "dist"] }));
 
     const result = await ensureTsconfigExclude(TEST_DIR);
     expect(result).toBe(true);
@@ -109,10 +90,7 @@ describe("ensureTsconfigExclude", () => {
   });
 
   it("creates exclude array if it does not exist", async () => {
-    await writeFile(
-      TSCONFIG_PATH,
-      JSON.stringify({ compilerOptions: { strict: true } }),
-    );
+    await writeFile(TSCONFIG_PATH, JSON.stringify({ compilerOptions: { strict: true } }));
 
     const result = await ensureTsconfigExclude(TEST_DIR);
     expect(result).toBe(true);

@@ -1,4 +1,4 @@
-import type { ResolvedPackage } from "../../types.js";
+import type { ResolvedPackage } from "../../types";
 
 const CRATES_API = "https://crates.io/api/v1";
 

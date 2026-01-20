@@ -2,11 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdir, rm, readFile, writeFile } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
-import {
-  hasOpensrcEntry,
-  ensureGitignore,
-  removeFromGitignore,
-} from "./gitignore.js";
+import { hasOpensrcEntry, ensureGitignore, removeFromGitignore } from "./gitignore";
 
 const TEST_DIR = join(process.cwd(), ".test-gitignore");
 const GITIGNORE_PATH = join(TEST_DIR, ".gitignore");

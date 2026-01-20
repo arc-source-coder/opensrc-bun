@@ -1,4 +1,4 @@
-import type { ResolvedPackage } from "../../types.js";
+import type { ResolvedPackage } from "../../types";
 
 const PYPI_API = "https://pypi.org/pypi";
 
