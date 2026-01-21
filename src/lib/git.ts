@@ -1,7 +1,7 @@
+import { $ } from "bun";
 import { join } from "node:path";
 import { existsSync } from "node:fs";
 import { rm, mkdir, readdir } from "node:fs/promises";
-import { simpleGit, SimpleGit } from "simple-git";
 
 import type { ResolvedPackage, ResolvedRepo, FetchResult, Registry } from "../types";
 
@@ -160,7 +160,6 @@ export async function getRepoInfo(
  * Try to clone at a specific tag, with fallbacks
  */
 async function cloneAtTag(
-  git: SimpleGit,
   repoUrl: string,
   targetPath: string,
   version: string,
@@ -169,7 +168,7 @@ async function cloneAtTag(
 
   for (const tag of tagsToTry) {
     try {
-      await git.clone(repoUrl, targetPath, ["--depth", "1", "--branch", tag, "--single-branch"]);
+      await $`git clone --depth 1 --branch ${tag} --single-branch ${repoUrl} ${targetPath}`;
       return { success: true, tag };
     } catch {
       continue;
@@ -178,7 +177,7 @@ async function cloneAtTag(
 
   // If no tag worked, clone default branch with a warning
   try {
-    await git.clone(repoUrl, targetPath, ["--depth", "1"]);
+    await $`git clone --depth 1 ${repoUrl} ${targetPath}`;
     return {
       success: true,
       tag: "HEAD",
@@ -196,13 +195,12 @@ async function cloneAtTag(
  * Clone a repository at a specific ref (branch, tag, or commit)
  */
 async function cloneAtRef(
-  git: SimpleGit,
   repoUrl: string,
   targetPath: string,
   ref: string,
 ): Promise<{ success: boolean; ref?: string; error?: string }> {
   try {
-    await git.clone(repoUrl, targetPath, ["--depth", "1", "--branch", ref, "--single-branch"]);
+    await $`git clone --depth 1 --branch ${ref} --single-branch ${repoUrl} ${targetPath}`;
     return { success: true, ref };
   } catch {
     // Ref might be a commit or doesn't exist as a branch/tag
@@ -210,7 +208,7 @@ async function cloneAtRef(
 
   // Clone default branch
   try {
-    await git.clone(repoUrl, targetPath, ["--depth", "1"]);
+    await $`git clone --depth 1 ${repoUrl} ${targetPath}`;
     return {
       success: true,
       ref: "HEAD",
@@ -231,8 +229,6 @@ export async function fetchSource(
   resolved: ResolvedPackage,
   cwd: string = process.cwd(),
 ): Promise<FetchResult> {
-  const git = simpleGit();
-
   // Get repo display name from URL
   const repoDisplayName = getRepoDisplayName(resolved.repoUrl);
   if (!repoDisplayName) {
@@ -262,7 +258,7 @@ export async function fetchSource(
   await mkdir(parentDir, { recursive: true });
 
   // Clone the repository
-  const cloneResult = await cloneAtTag(git, resolved.repoUrl, repoPath, resolved.version);
+  const cloneResult = await cloneAtTag(resolved.repoUrl, repoPath, resolved.version);
 
   if (!cloneResult.success) {
     return {
@@ -304,7 +300,6 @@ export async function fetchRepoSource(
   resolved: ResolvedRepo,
   cwd: string = process.cwd(),
 ): Promise<FetchResult> {
-  const git = simpleGit();
   const repoPath = getRepoPath(resolved.displayName, cwd);
   const reposDir = getReposDir(cwd);
 
@@ -321,7 +316,7 @@ export async function fetchRepoSource(
   await mkdir(parentDir, { recursive: true });
 
   // Clone the repository
-  const cloneResult = await cloneAtRef(git, resolved.repoUrl, repoPath, resolved.ref);
+  const cloneResult = await cloneAtRef(resolved.repoUrl, repoPath, resolved.ref);
 
   if (!cloneResult.success) {
     return {
