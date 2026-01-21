@@ -1,6 +1,5 @@
-import { readFile, writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+import { join } from "node:path";
+import { mkdir } from "node:fs/promises";
 
 const OPENSRC_DIR = "opensrc";
 const SETTINGS_FILE = "settings.json";
@@ -21,9 +20,7 @@ function getSettingsPath(cwd: string): string {
  */
 async function ensureOpensrcDir(cwd: string): Promise<void> {
   const opensrcDir = join(cwd, OPENSRC_DIR);
-  if (!existsSync(opensrcDir)) {
-    await mkdir(opensrcDir, { recursive: true });
-  }
+  await mkdir(opensrcDir, { recursive: true });
 }
 
 /**
@@ -31,14 +28,14 @@ async function ensureOpensrcDir(cwd: string): Promise<void> {
  */
 export async function readSettings(cwd: string = process.cwd()): Promise<OpensrcSettings> {
   const settingsPath = getSettingsPath(cwd);
+  const settingsFile = Bun.file(settingsPath);
 
-  if (!existsSync(settingsPath)) {
+  if (!(await settingsFile.exists())) {
     return {};
   }
 
   try {
-    const content = await readFile(settingsPath, "utf-8");
-    return JSON.parse(content) as OpensrcSettings;
+    return (await settingsFile.json()) as OpensrcSettings;
   } catch {
     return {};
   }
@@ -53,7 +50,7 @@ export async function writeSettings(
 ): Promise<void> {
   await ensureOpensrcDir(cwd);
   const settingsPath = getSettingsPath(cwd);
-  await writeFile(settingsPath, JSON.stringify(settings, null, 2) + "\n", "utf-8");
+  await Bun.write(settingsPath, JSON.stringify(settings, null, 2) + "\n");
 }
 
 /**

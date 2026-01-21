@@ -1,5 +1,5 @@
-import { rm } from "fs/promises";
-import { existsSync } from "fs";
+import { existsSync } from "node:fs";
+import { rm } from "node:fs/promises";
 import { getReposDir, listSources } from "../lib/git";
 import { updateAgentsMd, type PackageEntry, type RepoEntry } from "../lib/agents";
 import type { Registry } from "../types";
@@ -129,7 +129,7 @@ export async function cleanCommand(options: CleanOptions = {}): Promise<void> {
  * Recursively clean up empty directories
  */
 async function cleanupEmptyDirs(dir: string): Promise<boolean> {
-  const { readdir, rmdir } = await import("fs/promises");
+  const { readdir, rmdir } = await import("node:fs/promises");
 
   try {
     const entries = await readdir(dir, { withFileTypes: true });

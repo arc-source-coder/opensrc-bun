@@ -1,6 +1,4 @@
-import { readFile, writeFile } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+import { join } from "node:path";
 
 const OPENSRC_DIR = "opensrc";
 
@@ -12,8 +10,8 @@ interface TsConfig {
 /**
  * Check if tsconfig.json exists
  */
-export function hasTsConfig(cwd: string = process.cwd()): boolean {
-  return existsSync(join(cwd, "tsconfig.json"));
+export async function hasTsConfig(cwd: string = process.cwd()): Promise<boolean> {
+  return await Bun.file(join(cwd, "tsconfig.json")).exists();
 }
 
 /**
@@ -21,14 +19,14 @@ export function hasTsConfig(cwd: string = process.cwd()): boolean {
  */
 export async function hasOpensrcExclude(cwd: string = process.cwd()): Promise<boolean> {
   const tsconfigPath = join(cwd, "tsconfig.json");
+  const tsconfigFile = Bun.file(tsconfigPath);
 
-  if (!existsSync(tsconfigPath)) {
+  if (!(await tsconfigFile.exists())) {
     return false;
   }
 
   try {
-    const content = await readFile(tsconfigPath, "utf-8");
-    const config = JSON.parse(content) as TsConfig;
+    const config = (await tsconfigFile.json()) as TsConfig;
 
     if (!config.exclude) {
       return false;
@@ -48,8 +46,9 @@ export async function hasOpensrcExclude(cwd: string = process.cwd()): Promise<bo
  */
 export async function ensureTsconfigExclude(cwd: string = process.cwd()): Promise<boolean> {
   const tsconfigPath = join(cwd, "tsconfig.json");
+  const tsconfigFile = Bun.file(tsconfigPath);
 
-  if (!existsSync(tsconfigPath)) {
+  if (!(await tsconfigFile.exists())) {
     return false;
   }
 
@@ -59,8 +58,7 @@ export async function ensureTsconfigExclude(cwd: string = process.cwd()): Promis
   }
 
   try {
-    const content = await readFile(tsconfigPath, "utf-8");
-    const config = JSON.parse(content) as TsConfig;
+    const config = (await tsconfigFile.json()) as TsConfig;
 
     if (!config.exclude) {
       config.exclude = [];
@@ -69,7 +67,7 @@ export async function ensureTsconfigExclude(cwd: string = process.cwd()): Promis
     config.exclude.push(OPENSRC_DIR);
 
     // Preserve formatting by using 2-space indent (most common for tsconfig)
-    await writeFile(tsconfigPath, JSON.stringify(config, null, 2) + "\n", "utf-8");
+    await Bun.write(tsconfigPath, JSON.stringify(config, null, 2) + "\n");
     return true;
   } catch {
     return false;

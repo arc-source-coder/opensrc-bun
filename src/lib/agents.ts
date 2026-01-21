@@ -1,6 +1,4 @@
-import { readFile, writeFile } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+import { join } from "node:path";
 import type { Registry } from "../types";
 
 const AGENTS_FILE = "AGENTS.md";
@@ -71,12 +69,12 @@ export async function updatePackageIndex(
 ): Promise<void> {
   const opensrcDir = join(cwd, OPENSRC_DIR);
   const sourcesPath = join(opensrcDir, SOURCES_FILE);
+  const sourcesFile = Bun.file(sourcesPath);
 
   if (sources.packages.length === 0 && sources.repos.length === 0) {
     // Remove index file if no sources
-    if (existsSync(sourcesPath)) {
-      const { rm } = await import("fs/promises");
-      await rm(sourcesPath, { force: true });
+    if (await sourcesFile.exists()) {
+      await sourcesFile.delete();
     }
     return;
   }
@@ -104,7 +102,7 @@ export async function updatePackageIndex(
     }));
   }
 
-  await writeFile(sourcesPath, JSON.stringify(index, null, 2), "utf-8");
+  await Bun.write(sourcesPath, JSON.stringify(index, null, 2));
 }
 
 /**
@@ -112,13 +110,14 @@ export async function updatePackageIndex(
  */
 export async function hasOpensrcSection(cwd: string = process.cwd()): Promise<boolean> {
   const agentsPath = join(cwd, AGENTS_FILE);
+  const agentsFile = Bun.file(agentsPath);
 
-  if (!existsSync(agentsPath)) {
+  if (!(await agentsFile.exists())) {
     return false;
   }
 
   try {
-    const content = await readFile(agentsPath, "utf-8");
+    const content = await agentsFile.text();
     return content.includes(SECTION_MARKER);
   } catch {
     return false;
@@ -144,10 +143,11 @@ function extractSection(content: string): string | null {
  */
 export async function ensureAgentsMd(cwd: string = process.cwd()): Promise<boolean> {
   const agentsPath = join(cwd, AGENTS_FILE);
+  const agentsFile = Bun.file(agentsPath);
   const newSection = getSectionContent();
 
-  if (existsSync(agentsPath)) {
-    const content = await readFile(agentsPath, "utf-8");
+  if (await agentsFile.exists()) {
+    const content = await agentsFile.text();
 
     if (content.includes(SECTION_MARKER)) {
       // Section exists - check if it needs updating
@@ -166,7 +166,7 @@ export async function ensureAgentsMd(cwd: string = process.cwd()): Promise<boole
       const after = content.slice(endIdx + SECTION_END_MARKER.length);
 
       const newContent = before + newSection + after;
-      await writeFile(agentsPath, newContent, "utf-8");
+      await Bun.write(agentsPath, newContent);
       return true;
     } else {
       // Section doesn't exist - add it
@@ -175,7 +175,7 @@ export async function ensureAgentsMd(cwd: string = process.cwd()): Promise<boole
         newContent += "\n";
       }
       newContent += "\n" + newSection;
-      await writeFile(agentsPath, newContent, "utf-8");
+      await Bun.write(agentsPath, newContent);
       return true;
     }
   } else {
@@ -186,7 +186,7 @@ Instructions for AI coding agents working with this codebase.
 
 ${newSection}
 `;
-    await writeFile(agentsPath, content, "utf-8");
+    await Bun.write(agentsPath, content);
     return true;
   }
 }
@@ -217,13 +217,14 @@ export async function updateAgentsMd(
  */
 export async function removeOpensrcSection(cwd: string = process.cwd()): Promise<boolean> {
   const agentsPath = join(cwd, AGENTS_FILE);
+  const agentsFile = Bun.file(agentsPath);
 
-  if (!existsSync(agentsPath)) {
+  if (!(await agentsFile.exists())) {
     return false;
   }
 
   try {
-    const content = await readFile(agentsPath, "utf-8");
+    const content = await agentsFile.text();
 
     if (!content.includes(SECTION_MARKER)) {
       return false;
@@ -247,7 +248,7 @@ export async function removeOpensrcSection(cwd: string = process.cwd()): Promise
     // Clean up multiple consecutive newlines
     newContent = newContent.replace(/\n{3,}/g, "\n\n").trim() + "\n";
 
-    await writeFile(agentsPath, newContent, "utf-8");
+    await Bun.write(agentsPath, newContent);
     return true;
   } catch {
     return false;

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from "bun:test";
-import { mkdir, rm, writeFile } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+import { join } from "node:path";
+import { existsSync } from "node:fs";
+import { mkdir, rm } from "node:fs/promises";
 import {
   getOpensrcDir,
   getReposDir,
@@ -162,13 +162,13 @@ describe("sources.json reading", () => {
     });
 
     it("returns null if package not in sources.json", async () => {
-      await writeFile(join(OPENSRC_DIR, "sources.json"), JSON.stringify({ packages: [] }));
+      await Bun.write(join(OPENSRC_DIR, "sources.json"), JSON.stringify({ packages: [] }));
 
       expect(await getPackageInfo("zod", TEST_DIR, "npm")).toBeNull();
     });
 
     it("returns package info if found", async () => {
-      await writeFile(
+      await Bun.write(
         join(OPENSRC_DIR, "sources.json"),
         JSON.stringify({
           packages: [
@@ -194,7 +194,7 @@ describe("sources.json reading", () => {
     });
 
     it("returns null for wrong registry", async () => {
-      await writeFile(
+      await Bun.write(
         join(OPENSRC_DIR, "sources.json"),
         JSON.stringify({
           packages: [
@@ -219,13 +219,13 @@ describe("sources.json reading", () => {
     });
 
     it("returns null if repo not in sources.json", async () => {
-      await writeFile(join(OPENSRC_DIR, "sources.json"), JSON.stringify({ repos: [] }));
+      await Bun.write(join(OPENSRC_DIR, "sources.json"), JSON.stringify({ repos: [] }));
 
       expect(await getRepoInfo("github.com/vercel/ai", TEST_DIR)).toBeNull();
     });
 
     it("returns repo info if found", async () => {
-      await writeFile(
+      await Bun.write(
         join(OPENSRC_DIR, "sources.json"),
         JSON.stringify({
           repos: [
@@ -259,7 +259,7 @@ describe("sources.json reading", () => {
     });
 
     it("returns sources from sources.json", async () => {
-      await writeFile(
+      await Bun.write(
         join(OPENSRC_DIR, "sources.json"),
         JSON.stringify({
           packages: [
@@ -310,8 +310,8 @@ describe("removal functions", () => {
     it("removes repo when package is the only user", async () => {
       const repoDir = join(OPENSRC_DIR, "repos", "github.com", "colinhacks", "zod");
       await mkdir(repoDir, { recursive: true });
-      await writeFile(join(repoDir, "package.json"), "{}");
-      await writeFile(
+      await Bun.write(join(repoDir, "package.json"), "{}");
+      await Bun.write(
         join(OPENSRC_DIR, "sources.json"),
         JSON.stringify({
           packages: [
@@ -335,8 +335,8 @@ describe("removal functions", () => {
     it("does not remove repo when other packages share it", async () => {
       const repoDir = join(OPENSRC_DIR, "repos", "github.com", "owner", "monorepo");
       await mkdir(repoDir, { recursive: true });
-      await writeFile(join(repoDir, "package.json"), "{}");
-      await writeFile(
+      await Bun.write(join(repoDir, "package.json"), "{}");
+      await Bun.write(
         join(OPENSRC_DIR, "sources.json"),
         JSON.stringify({
           packages: [
@@ -374,7 +374,7 @@ describe("removal functions", () => {
     it("removes repo directory", async () => {
       const repoDir = join(OPENSRC_DIR, "repos", "github.com", "vercel", "ai");
       await mkdir(repoDir, { recursive: true });
-      await writeFile(join(repoDir, "README.md"), "# AI");
+      await Bun.write(join(repoDir, "README.md"), "# AI");
 
       const result = await removeRepoSource("github.com/vercel/ai", TEST_DIR);
       expect(result).toBe(true);

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from "bun:test";
-import { mkdir, rm, readFile, writeFile } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+import { join } from "node:path";
+import { existsSync } from "node:fs";
+import { mkdir, rm } from "node:fs/promises";
 import {
   hasOpensrcSection,
   ensureAgentsMd,
@@ -34,12 +34,12 @@ describe("hasOpensrcSection", () => {
   });
 
   it("returns false if AGENTS.md exists but has no section", async () => {
-    await writeFile(AGENTS_FILE, "# AGENTS.md\n\nSome content");
+    await Bun.write(AGENTS_FILE, "# AGENTS.md\n\nSome content");
     expect(await hasOpensrcSection(TEST_DIR)).toBe(false);
   });
 
   it("returns true if AGENTS.md has the opensrc section", async () => {
-    await writeFile(
+    await Bun.write(
       AGENTS_FILE,
       `# AGENTS.md\n\n${SECTION_MARKER}\nContent\n${SECTION_END_MARKER}`,
     );
@@ -50,10 +50,11 @@ describe("hasOpensrcSection", () => {
 describe("ensureAgentsMd", () => {
   it("creates AGENTS.md if it does not exist", async () => {
     const result = await ensureAgentsMd(TEST_DIR);
+    const agentsFile = Bun.file(AGENTS_FILE);
     expect(result).toBe(true);
-    expect(existsSync(AGENTS_FILE)).toBe(true);
+    expect(await agentsFile.exists()).toBe(true);
 
-    const content = await readFile(AGENTS_FILE, "utf-8");
+    const content = await agentsFile.text();
     expect(content).toContain("# AGENTS.md");
     expect(content).toContain(SECTION_MARKER);
     expect(content).toContain(SECTION_END_MARKER);
@@ -61,12 +62,12 @@ describe("ensureAgentsMd", () => {
   });
 
   it("appends section to existing AGENTS.md without section", async () => {
-    await writeFile(AGENTS_FILE, "# AGENTS.md\n\nExisting content here.");
+    await Bun.write(AGENTS_FILE, "# AGENTS.md\n\nExisting content here.");
 
     const result = await ensureAgentsMd(TEST_DIR);
     expect(result).toBe(true);
 
-    const content = await readFile(AGENTS_FILE, "utf-8");
+    const content = await Bun.file(AGENTS_FILE).text();
     expect(content).toContain("Existing content here.");
     expect(content).toContain(SECTION_MARKER);
     expect(content).toContain("npx opensrc");
@@ -84,23 +85,23 @@ describe("ensureAgentsMd", () => {
   it("updates section if content has changed", async () => {
     // Create file with old section content
     const oldSection = `${SECTION_MARKER}\n\nOld content\n\n${SECTION_END_MARKER}`;
-    await writeFile(AGENTS_FILE, `# AGENTS.md\n\n${oldSection}`);
+    await Bun.write(AGENTS_FILE, `# AGENTS.md\n\n${oldSection}`);
 
     const result = await ensureAgentsMd(TEST_DIR);
     expect(result).toBe(true);
 
-    const content = await readFile(AGENTS_FILE, "utf-8");
+    const content = await Bun.file(AGENTS_FILE).text();
     expect(content).not.toContain("Old content");
     expect(content).toContain("Source Code Reference");
   });
 
   it("preserves content before and after section when updating", async () => {
     const oldSection = `${SECTION_MARKER}\n\nOld content\n\n${SECTION_END_MARKER}`;
-    await writeFile(AGENTS_FILE, `# Header\n\nBefore content\n\n${oldSection}\n\nAfter content`);
+    await Bun.write(AGENTS_FILE, `# Header\n\nBefore content\n\n${oldSection}\n\nAfter content`);
 
     await ensureAgentsMd(TEST_DIR);
 
-    const content = await readFile(AGENTS_FILE, "utf-8");
+    const content = await Bun.file(AGENTS_FILE).text();
     expect(content).toContain("# Header");
     expect(content).toContain("Before content");
     expect(content).toContain("After content");
@@ -125,8 +126,9 @@ describe("updatePackageIndex", () => {
 
     await updatePackageIndex(sources, TEST_DIR);
 
-    expect(existsSync(SOURCES_FILE)).toBe(true);
-    const content = JSON.parse(await readFile(SOURCES_FILE, "utf-8"));
+    const sourcesFile = Bun.file(SOURCES_FILE);
+    expect(await sourcesFile.exists()).toBe(true);
+    const content = await sourcesFile.json();
     expect(content.packages).toHaveLength(1);
     expect(content.packages[0].name).toBe("zod");
     expect(content.packages[0].registry).toBe("npm");
@@ -147,7 +149,7 @@ describe("updatePackageIndex", () => {
 
     await updatePackageIndex(sources, TEST_DIR);
 
-    const content = JSON.parse(await readFile(SOURCES_FILE, "utf-8"));
+    const content = await Bun.file(SOURCES_FILE).json();
     expect(content.repos).toHaveLength(1);
     expect(content.repos[0].name).toBe("github.com/vercel/ai");
   });
@@ -167,7 +169,7 @@ describe("updatePackageIndex", () => {
 
     await updatePackageIndex(sources, TEST_DIR);
 
-    const content = JSON.parse(await readFile(SOURCES_FILE, "utf-8"));
+    const content = await Bun.file(SOURCES_FILE).json();
     expect(content.packages).toBeUndefined();
     expect(content.repos).toBeDefined();
   });
@@ -188,14 +190,14 @@ describe("updatePackageIndex", () => {
 
     await updatePackageIndex(sources, TEST_DIR);
 
-    const content = JSON.parse(await readFile(SOURCES_FILE, "utf-8"));
+    const content = await Bun.file(SOURCES_FILE).json();
     expect(content.packages).toBeDefined();
     expect(content.repos).toBeUndefined();
   });
 
   it("removes sources.json if no sources", async () => {
     // First create a sources.json
-    await writeFile(SOURCES_FILE, JSON.stringify({ packages: [], repos: [] }));
+    await Bun.write(SOURCES_FILE, JSON.stringify({ packages: [], repos: [] }));
 
     const sources = {
       packages: [],
@@ -204,7 +206,7 @@ describe("updatePackageIndex", () => {
 
     await updatePackageIndex(sources, TEST_DIR);
 
-    expect(existsSync(SOURCES_FILE)).toBe(false);
+    expect(await Bun.file(SOURCES_FILE).exists()).toBe(false);
   });
 
   it("includes updatedAt timestamp", async () => {
@@ -223,7 +225,7 @@ describe("updatePackageIndex", () => {
 
     await updatePackageIndex(sources, TEST_DIR);
 
-    const content = JSON.parse(await readFile(SOURCES_FILE, "utf-8"));
+    const content = await Bun.file(SOURCES_FILE).json();
     expect(content.updatedAt).toBeDefined();
     expect(new Date(content.updatedAt).getTime()).not.toBeNaN();
   });
@@ -246,8 +248,8 @@ describe("updateAgentsMd", () => {
 
     await updateAgentsMd(sources, TEST_DIR);
 
-    expect(existsSync(SOURCES_FILE)).toBe(true);
-    expect(existsSync(AGENTS_FILE)).toBe(true);
+    expect(await Bun.file(SOURCES_FILE).exists()).toBe(true);
+    expect(await Bun.file(AGENTS_FILE).exists()).toBe(true);
   });
 
   it("does not create AGENTS.md if no sources", async () => {
@@ -258,7 +260,7 @@ describe("updateAgentsMd", () => {
 
     await updateAgentsMd(sources, TEST_DIR);
 
-    expect(existsSync(AGENTS_FILE)).toBe(false);
+    expect(await Bun.file(AGENTS_FILE).exists()).toBe(false);
   });
 });
 
@@ -269,14 +271,14 @@ describe("removeOpensrcSection", () => {
   });
 
   it("returns false if no section exists", async () => {
-    await writeFile(AGENTS_FILE, "# AGENTS.md\n\nNo section here.");
+    await Bun.write(AGENTS_FILE, "# AGENTS.md\n\nNo section here.");
 
     const result = await removeOpensrcSection(TEST_DIR);
     expect(result).toBe(false);
   });
 
   it("removes the opensrc section", async () => {
-    await writeFile(
+    await Bun.write(
       AGENTS_FILE,
       `# AGENTS.md\n\nBefore\n\n${SECTION_MARKER}\n\nSection content\n\n${SECTION_END_MARKER}\n\nAfter`,
     );
@@ -284,7 +286,7 @@ describe("removeOpensrcSection", () => {
     const result = await removeOpensrcSection(TEST_DIR);
     expect(result).toBe(true);
 
-    const content = await readFile(AGENTS_FILE, "utf-8");
+    const content = await Bun.file(AGENTS_FILE).text();
     expect(content).toContain("Before");
     expect(content).toContain("After");
     expect(content).not.toContain(SECTION_MARKER);
@@ -292,14 +294,14 @@ describe("removeOpensrcSection", () => {
   });
 
   it("cleans up extra newlines", async () => {
-    await writeFile(
+    await Bun.write(
       AGENTS_FILE,
       `# AGENTS.md\n\n\n\n${SECTION_MARKER}\n\nContent\n\n${SECTION_END_MARKER}\n\n\n\n`,
     );
 
     await removeOpensrcSection(TEST_DIR);
 
-    const content = await readFile(AGENTS_FILE, "utf-8");
+    const content = await Bun.file(AGENTS_FILE).text();
     // Should not have more than 2 consecutive newlines
     expect(content).not.toMatch(/\n{3,}/);
   });

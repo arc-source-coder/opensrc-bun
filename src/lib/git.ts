@@ -1,7 +1,8 @@
+import { join } from "node:path";
+import { existsSync } from "node:fs";
+import { rm, mkdir, readdir } from "node:fs/promises";
 import { simpleGit, SimpleGit } from "simple-git";
-import { rm, mkdir, readFile } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+
 import type { ResolvedPackage, ResolvedRepo, FetchResult, Registry } from "../types";
 
 const OPENSRC_DIR = "opensrc";
@@ -95,14 +96,14 @@ async function readSourcesJson(cwd: string): Promise<{
   repos?: RepoEntry[];
 } | null> {
   const sourcesPath = join(getOpensrcDir(cwd), SOURCES_FILE);
+  const sourcesFile = Bun.file(sourcesPath);
 
-  if (!existsSync(sourcesPath)) {
+  if (!(await sourcesFile.exists())) {
     return null;
   }
 
   try {
-    const content = await readFile(sourcesPath, "utf-8");
-    return JSON.parse(content);
+    return await sourcesFile.json();
   } catch {
     return null;
   }
@@ -248,10 +249,8 @@ export async function fetchSource(
   const repoPath = getRepoPath(repoDisplayName, cwd);
   const reposDir = getReposDir(cwd);
 
-  // Ensure repos directory exists
-  if (!existsSync(reposDir)) {
-    await mkdir(reposDir, { recursive: true });
-  }
+  // Ensure repos directory exists - Does not throw if it already exists
+  await mkdir(reposDir, { recursive: true });
 
   // Remove existing if present (re-fetch at potentially different version)
   if (existsSync(repoPath)) {
@@ -260,9 +259,7 @@ export async function fetchSource(
 
   // Ensure parent directories exist (for host/owner structure)
   const parentDir = join(repoPath, "..");
-  if (!existsSync(parentDir)) {
-    await mkdir(parentDir, { recursive: true });
-  }
+  await mkdir(parentDir, { recursive: true });
 
   // Clone the repository
   const cloneResult = await cloneAtTag(git, resolved.repoUrl, repoPath, resolved.version);
@@ -311,10 +308,8 @@ export async function fetchRepoSource(
   const repoPath = getRepoPath(resolved.displayName, cwd);
   const reposDir = getReposDir(cwd);
 
-  // Ensure repos directory exists
-  if (!existsSync(reposDir)) {
-    await mkdir(reposDir, { recursive: true });
-  }
+  // Ensure repos directory exists - Does not throw if it already exists
+  await mkdir(reposDir, { recursive: true });
 
   // Remove existing if present
   if (existsSync(repoPath)) {
@@ -323,9 +318,7 @@ export async function fetchRepoSource(
 
   // Ensure parent directories exist (for host/owner structure)
   const parentDir = join(repoPath, "..");
-  if (!existsSync(parentDir)) {
-    await mkdir(parentDir, { recursive: true });
-  }
+  await mkdir(parentDir, { recursive: true });
 
   // Clone the repository
   const cloneResult = await cloneAtRef(git, resolved.repoUrl, repoPath, resolved.ref);
@@ -440,14 +433,14 @@ async function cleanupEmptyParentDirs(relativePath: string, cwd: string): Promis
   const parts = relativePath.split("/");
   if (parts.length < 4) return; // repos/host/owner/repo - need at least 4 parts
 
-  const { readdir } = await import("fs/promises");
   const opensrcDir = getOpensrcDir(cwd);
 
   // Try to clean up owner directory (repos/host/owner)
   const ownerDir = join(opensrcDir, parts[0], parts[1], parts[2]);
+
   try {
-    const ownerContents = await readdir(ownerDir);
-    if (ownerContents.length === 0) {
+    const contents = await readdir(ownerDir);
+    if (contents.length === 0) {
       await rm(ownerDir, { recursive: true, force: true });
     }
   } catch {
@@ -457,8 +450,8 @@ async function cleanupEmptyParentDirs(relativePath: string, cwd: string): Promis
   // Try to clean up host directory (repos/host)
   const hostDir = join(opensrcDir, parts[0], parts[1]);
   try {
-    const hostContents = await readdir(hostDir);
-    if (hostContents.length === 0) {
+    const contents = await readdir(hostDir);
+    if (contents.length === 0) {
       await rm(hostDir, { recursive: true, force: true });
     }
   } catch {

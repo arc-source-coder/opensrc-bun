@@ -1,6 +1,4 @@
-import { readFile, writeFile } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+import { join } from "node:path";
 
 const OPENSRC_ENTRY = "opensrc/";
 const MARKER_COMMENT = "# opensrc - source code for packages";
@@ -10,13 +8,14 @@ const MARKER_COMMENT = "# opensrc - source code for packages";
  */
 export async function hasOpensrcEntry(cwd: string = process.cwd()): Promise<boolean> {
   const gitignorePath = join(cwd, ".gitignore");
+  const gitignoreFile = Bun.file(gitignorePath);
 
-  if (!existsSync(gitignorePath)) {
+  if (!(await gitignoreFile.exists())) {
     return false;
   }
 
   try {
-    const content = await readFile(gitignorePath, "utf-8");
+    const content = await gitignoreFile.text();
     const lines = content.split("\n");
 
     return lines.some((line) => {
@@ -40,9 +39,10 @@ export async function ensureGitignore(cwd: string = process.cwd()): Promise<bool
   }
 
   let content = "";
+  const gitignoreFile = Bun.file(gitignorePath);
 
-  if (existsSync(gitignorePath)) {
-    content = await readFile(gitignorePath, "utf-8");
+  if (await gitignoreFile.exists()) {
+    content = await gitignoreFile.text();
     // Ensure there's a newline at the end before we append
     if (content.length > 0 && !content.endsWith("\n")) {
       content += "\n";
@@ -55,7 +55,7 @@ export async function ensureGitignore(cwd: string = process.cwd()): Promise<bool
 
   content += `${MARKER_COMMENT}\n${OPENSRC_ENTRY}\n`;
 
-  await writeFile(gitignorePath, content, "utf-8");
+  await Bun.write(gitignorePath, content);
   return true; // Changes made
 }
 
@@ -64,13 +64,14 @@ export async function ensureGitignore(cwd: string = process.cwd()): Promise<bool
  */
 export async function removeFromGitignore(cwd: string = process.cwd()): Promise<boolean> {
   const gitignorePath = join(cwd, ".gitignore");
+  const gitignoreFile = Bun.file(gitignorePath);
 
-  if (!existsSync(gitignorePath)) {
+  if (!(await gitignoreFile.exists())) {
     return false;
   }
 
   try {
-    const content = await readFile(gitignorePath, "utf-8");
+    const content = await gitignoreFile.text();
     const lines = content.split("\n");
 
     const newLines = lines.filter((line) => {
@@ -93,7 +94,7 @@ export async function removeFromGitignore(cwd: string = process.cwd()): Promise<
     const newContent = cleanedLines.join("\n");
 
     if (newContent !== content) {
-      await writeFile(gitignorePath, newContent, "utf-8");
+      await Bun.write(gitignorePath, newContent);
       return true;
     }
 

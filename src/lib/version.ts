@@ -1,6 +1,4 @@
-import { readFile } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+import { join } from "node:path";
 import type { InstalledPackage } from "../types";
 
 interface PackageJson {
@@ -26,14 +24,14 @@ function stripVersionPrefix(version: string): string {
  */
 async function getVersionFromNodeModules(packageName: string, cwd: string): Promise<string | null> {
   const packageJsonPath = join(cwd, "node_modules", packageName, "package.json");
+  const packageJsonFile = Bun.file(packageJsonPath);
 
-  if (!existsSync(packageJsonPath)) {
+  if (!(await packageJsonFile.exists())) {
     return null;
   }
 
   try {
-    const content = await readFile(packageJsonPath, "utf-8");
-    const pkg = JSON.parse(content) as { version?: string };
+    const pkg = (await packageJsonFile.json()) as { version?: string };
     return pkg.version || null;
   } catch {
     return null;
@@ -45,14 +43,14 @@ async function getVersionFromNodeModules(packageName: string, cwd: string): Prom
  */
 async function getVersionFromPackageLock(packageName: string, cwd: string): Promise<string | null> {
   const lockPath = join(cwd, "package-lock.json");
+  const lockFile = Bun.file(lockPath);
 
-  if (!existsSync(lockPath)) {
+  if (!(await lockFile.exists())) {
     return null;
   }
 
   try {
-    const content = await readFile(lockPath, "utf-8");
-    const lock = JSON.parse(content) as PackageLockJson;
+    const lock = (await lockFile.json()) as PackageLockJson;
 
     // npm v7+ format uses "packages"
     if (lock.packages) {
@@ -79,13 +77,14 @@ async function getVersionFromPackageLock(packageName: string, cwd: string): Prom
  */
 async function getVersionFromPnpmLock(packageName: string, cwd: string): Promise<string | null> {
   const lockPath = join(cwd, "pnpm-lock.yaml");
+  const lockFile = Bun.file(lockPath);
 
-  if (!existsSync(lockPath)) {
+  if (!(await lockFile.exists())) {
     return null;
   }
 
   try {
-    const content = await readFile(lockPath, "utf-8");
+    const content = await lockFile.text();
 
     // Look for the package in the lockfile
     // pnpm format: 'packageName@version(peer-deps):' or 'packageName@version:'
@@ -111,13 +110,14 @@ async function getVersionFromPnpmLock(packageName: string, cwd: string): Promise
  */
 async function getVersionFromYarnLock(packageName: string, cwd: string): Promise<string | null> {
   const lockPath = join(cwd, "yarn.lock");
+  const lockFile = Bun.file(lockPath);
 
-  if (!existsSync(lockPath)) {
+  if (!(await lockFile.exists())) {
     return null;
   }
 
   try {
-    const content = await readFile(lockPath, "utf-8");
+    const content = await lockFile.text();
 
     // Yarn lockfile format:
     // "packageName@^version":
@@ -144,14 +144,14 @@ async function getVersionFromYarnLock(packageName: string, cwd: string): Promise
  */
 async function getVersionFromPackageJson(packageName: string, cwd: string): Promise<string | null> {
   const packageJsonPath = join(cwd, "package.json");
+  const packageJsonFile = Bun.file(packageJsonPath);
 
-  if (!existsSync(packageJsonPath)) {
+  if (!(await packageJsonFile.exists())) {
     return null;
   }
 
   try {
-    const content = await readFile(packageJsonPath, "utf-8");
-    const pkg = JSON.parse(content) as PackageJson;
+    const pkg = (await packageJsonFile.json()) as PackageJson;
 
     const version =
       pkg.dependencies?.[packageName] ||
@@ -212,14 +212,14 @@ export async function detectInstalledVersion(
  */
 export async function listDependencies(cwd: string = process.cwd()): Promise<InstalledPackage[]> {
   const packageJsonPath = join(cwd, "package.json");
+  const packageJsonFile = Bun.file(packageJsonPath);
 
-  if (!existsSync(packageJsonPath)) {
+  if (!(await packageJsonFile.exists())) {
     return [];
   }
 
   try {
-    const content = await readFile(packageJsonPath, "utf-8");
-    const pkg = JSON.parse(content) as PackageJson;
+    const pkg = (await packageJsonFile.json()) as PackageJson;
 
     const deps: InstalledPackage[] = [];
 
